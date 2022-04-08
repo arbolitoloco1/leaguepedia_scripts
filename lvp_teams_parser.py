@@ -109,15 +109,14 @@ for web in teams.keys():
     else:
         output = parse_lolesports(output)
 
-while True:
+try:
+    site.save_title(title=f"User:Arbolitoloco/RostersLVP", text=str(output), summary=f"{datetime.now()}")
+    site.save_title(title=f"User:Arbolitoloco/RostersLVP/{full_date}", text=str(output), summary=f"{datetime.now()}")
+except:
     try:
         time.sleep(120)
         site.save_title(title=f"User:Arbolitoloco/RostersLVP", text=str(output), summary=f"{datetime.now()}")
-        site.save_title(title=f"User:Arbolitoloco/RostersLVP/{full_date}", text=str(output),
-                        summary=f"{datetime.now()}")
-        break
+        site.save_title(title=f"User:Arbolitoloco/RostersLVP/{full_date}", text=str(output), summary=f"{datetime.now()}")
     except Exception as e:
         with open(file="errores.txt", mode="a+", encoding="utf8") as f:
             f.write(str(e))
-        continue
-

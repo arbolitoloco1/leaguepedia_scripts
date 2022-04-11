@@ -4,9 +4,8 @@ import math
 
 
 class AutoTeamRosters(object):
-    def __init__(self, overview_page):
-        self.credentials = AuthCredentials(user_file="me")
-        self.site = EsportsClient("lol", credentials=self.credentials)
+    def __init__(self, site: EsportsClient, overview_page):
+        self.site = site
         self.overview_page = self.site.cache.get_target(overview_page)
         self.match_data = {}
         self.alt_teamnames = {}
@@ -156,4 +155,6 @@ class AutoTeamRosters(object):
 
 
 if __name__ == '__main__':
-    AutoTeamRosters("LMF 2022 Opening").run()
+    credentials = AuthCredentials(user_file="me")
+    lol_site = EsportsClient("lol", credentials=credentials)
+    AutoTeamRosters(lol_site, "LMF 2022 Opening").run()

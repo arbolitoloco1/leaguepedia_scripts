@@ -18,6 +18,8 @@ day = str(date.day).zfill(2)
 
 full_date = f"{year}-{month}-{day}"
 
+errors = []
+
 lolesports_endpoint = "https://esports-api.lolesports.com/persisted/gw/getTeams?hl=es-MX&id={}"
 lolesports_headers = {"x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
 
@@ -45,7 +47,6 @@ teams = {"lolesports": ["rainbow7", "infinity", "estral-esports", "team-aze", "x
 
 
 def parse_lvp(web, output):
-    print(web)
     languages_dict = {"ligamaster": "/ar", "ligadehonor": "/cl", "golden": "/co", "volcano": "/ec", "stars": "/pe",
                       "ddh": "/mx", "elements": "", "superliga": ""}
 
@@ -60,19 +61,23 @@ def parse_lvp(web, output):
             page = parsed_html.find_all("div", "squad-container-outer")
             squad = page[0].find("div", "players-container-inner")
             players = squad.find_all("a", "player-card")
+            if not players:
+                raise Exception("No players could be found")
             output += f"=== {team} ===\n\n"
             output += f"https://{web}.lvp.global{language}/equipo/{team}/\n\n"
             for player in players:
                 player_info = player.find("div", "upper-player-info-container")
                 player_nick = player_info.find("span", "player-nickname").text
                 player_position = player_info.find("span", "player-position").text
+                if not player_nick:
+                    raise Exception(f"Information for a player could not be found")
                 output += f"{player_nick} - {player_position}\n\n"
             output += "\n"
-            print(f"{team} - {web}")
         except Exception as e:
             output += f"ERROR: {e}\n\n"
             with open(file="errores.txt", mode="a+", encoding="utf8") as f:
                 f.write(str(e))
+            errors.append(f"ERROR: {web} - {team} - {e}\n\n")
             continue
     return output
 
@@ -83,9 +88,12 @@ def parse_lolesports(output):
         try:
             for team in teams["lolesports"]:
                 response = requests.get(lolesports_endpoint.format(team), headers=lolesports_headers)
+                if not response:
+                    raise Exception("Response from LoLEsports API is empty")
                 response = response.json()
-                print(response)
                 players = response["data"]["teams"][0]["players"]
+                if not players:
+                    raise Exception("No players could be found")
                 output += f"=== {team} ===\n\n"
                 for player in players:
                     player_nick = player["summonerName"]
@@ -96,10 +104,12 @@ def parse_lolesports(output):
             output += f"ERROR: {e}\n\n"
             with open(file="errores.txt", mode="a+", encoding="utf8") as f:
                 f.write(str(e))
+            errors.append(f"ERROR: {web} - {e}\n\n")
     except Exception as e:
         output += f"ERROR: {e}\n\n"
         with open(file="errores.txt", mode="a+", encoding="utf8") as f:
             f.write(str(e))
+            errors.append(f"ERROR: {web} - {e}\n\n")
     return output
 
 
@@ -111,12 +121,29 @@ for web in teams.keys():
 
 while True:
     try:
-        time.sleep(120)
-        site.save_title(title=f"User:Arbolitoloco/RostersLVP", text=str(output), summary=f"{datetime.now()}")
+        site.save_title(title=f"User:Arbolitoloco/RostersLVP", text=str(output), summary=f"{datetime.now(PST)}")
         site.save_title(title=f"User:Arbolitoloco/RostersLVP/{full_date}", text=str(output),
-                        summary=f"{datetime.now()}")
+                        summary=f"{datetime.now(PST)}")
         break
     except Exception as e:
         with open(file="errores.txt", mode="a+", encoding="utf8") as f:
             f.write(str(e))
+        time.sleep(120)
         continue
+
+errors_output = ""
+
+for error in errors:
+    errors_output += error
+
+if errors_output != "":
+    while True:
+        try:
+            site.save_title(title=f"User:Arbolitoloco/RostersLVP/Errors", text=str(errors_output),
+                            summary=f"{datetime.now(PST)}")
+            break
+        except Exception as e:
+            with open(file="errores.txt", mode="a+", encoding="utf8") as f:
+                f.write(str(e))
+            time.sleep(120)
+            continue

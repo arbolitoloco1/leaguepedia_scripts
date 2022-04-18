@@ -14,6 +14,7 @@ class AutoRosters(commands.Cog):
 
     @commands.command(pass_context=True)
     async def autorosters(self, ctx, *, overview_page):
+        """Generate Team Rosters for the specified tournaments"""
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
         await ctx.send("Tabs `Eg. LEC 2022`:")

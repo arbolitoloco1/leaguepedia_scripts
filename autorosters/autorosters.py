@@ -7,14 +7,14 @@ from .autorosters_main import AutoRostersRunner
 
 
 class AutoRosters(commands.Cog):
-    """Automatically generates Team Rosters for Leaguepedia, using scoreboard data"""
+    """Automatically generates team rosters for Leaguepedia, using scoreboard data"""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(pass_context=True)
     async def autorosters(self, ctx, *, overview_page):
-        """Generate Team Rosters for the specified tournament"""
+        """Generate team rosters for the specified tournament"""
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
         await ctx.send("Tabs `Eg. LEC 2022`:")

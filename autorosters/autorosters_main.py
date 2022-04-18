@@ -1,10 +1,9 @@
 from mwrogue.esports_client import EsportsClient
-from mwrogue.auth_credentials import AuthCredentials
 import math
 
 
 class AutoRostersRunner(object):
-    def __init__(self, site: EsportsClient, overview_page):
+    def __init__(self, site: EsportsClient, overview_page, tabs):
         self.site = site
         self.overview_page = self.site.cache.get_target(overview_page)
         self.match_data = {}
@@ -17,13 +16,11 @@ class AutoRostersRunner(object):
     def run(self):
         self.get_and_process_match_data()
         self.initialize_roster_data()
-        print(self.rosters_data)
         players_data = self.get_player_data()
         self.process_game_data()
-        print(self.rosters_data)
         sorted_data = self.get_order()
         output = self.make_output(sorted_data, players_data)
-        print(output)
+        self.save_page(output)
 
     def get_and_process_match_data(self):
         matchschedule_data = self.get_matchschedule_data()
@@ -125,7 +122,6 @@ class AutoRostersRunner(object):
                                                                                   "games_by_role": {}}
                         if player["IngameRole"] not in self.rosters_data[team]["players"][player["Link"]]["roles"]:
                             self.rosters_data[team]["players"][player["Link"]]["roles"].append(player["IngameRole"])
-        print(self.rosters_data)
         self.get_players_roles_data()
 
     @staticmethod
@@ -215,7 +211,6 @@ class AutoRostersRunner(object):
             for player, player_data in team_data["players"].items():
                 team_players[player] = role_numbers[player_data["roles"][0]]
             sorted_data["players"][team] = sorted(team_players.items(), key=lambda x: x[1])
-        print(sorted_data)
         return sorted_data
 
     @staticmethod
@@ -240,7 +235,6 @@ class AutoRostersRunner(object):
 
     def make_output(self, sorted_data, players_data):
         output = self.PAGE_HEADER.format("LEC 2022")
-        print(players_data)
         for team in sorted_data["teams"]:
             players_text = ""
             for player in sorted_data["players"][team]:
@@ -255,3 +249,7 @@ class AutoRostersRunner(object):
             teamsvs = self.concat_args(self.rosters_data[team]["teamsvs"])
             output += self.TEAM_TEXT.format(team, teamsvs, players_text)
         return output
+
+    def save_page(self, output):
+        page = self.site.client.pages[f"User:Arbolitoloco/{self.overview_page}/Team Rosters"]
+        self.site.save(title=page, text=output, summary="Automatically updating Rosters from Scoreboard Data")

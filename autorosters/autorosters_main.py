@@ -85,18 +85,18 @@ class AutoRostersRunner(object):
     def process_scoreboard_data(self, scoreboard_data):
         player_ids_cache = {}
 
-        for scoreboard_game in scoreboard_data:
-            if not self.match_data[scoreboard_game["MatchId"]]["games"][scoreboard_game["GameId"]].get("sg_data"):
-                self.match_data[scoreboard_game["MatchId"]]["games"][scoreboard_game["GameId"]]["sg_data"] = {
-                    "team1": scoreboard_game["Team1"],
-                    "team2": scoreboard_game["Team2"],
+        for scoreboard in scoreboard_data:
+            if "sg_data" not in self.match_data[scoreboard["MatchId"]]["games"][scoreboard["GameId"]].keys():
+                self.match_data[scoreboard["MatchId"]]["games"][scoreboard["GameId"]]["sg_data"] = {
+                    "team1": scoreboard["Team1"],
+                    "team2": scoreboard["Team2"],
                     "players": {}}
-            if scoreboard_game["Link"] not in player_ids_cache:
-                player_id = self.get_player_id(scoreboard_game["Link"])
-                player_ids_cache[scoreboard_game["Link"]] = player_id
-            player_page = player_ids_cache[scoreboard_game["Link"]]
-            self.match_data[scoreboard_game["MatchId"]]["games"][scoreboard_game["GameId"]]["sg_data"]["players"][player_page] = {"IngameRole": scoreboard_game["IngameRole"],
-                                                                                                                                  "Team": scoreboard_game["Team"],
+            if scoreboard["Link"] not in player_ids_cache:
+                player_id = self.get_player_id(scoreboard["Link"])
+                player_ids_cache[scoreboard["Link"]] = player_id
+            player_page = player_ids_cache[scoreboard["Link"]]
+            self.match_data[scoreboard["MatchId"]]["games"][scoreboard["GameId"]]["sg_data"]["players"][player_page] = {"IngameRole": scoreboard["IngameRole"],
+                                                                                                                                  "Team": scoreboard["Team"],
                                                                                                                                   "Link": player_page}
 
     def get_players_roles_data(self):

@@ -1,5 +1,5 @@
-from .autorosters import AutoTeamRosters
+from .autorosters import AutoRosters
 
 
 def setup(bot):
-    bot.add_cog(AutoTeamRosters(bot))
+    bot.add_cog(AutoRosters(bot))

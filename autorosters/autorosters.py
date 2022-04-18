@@ -16,7 +16,7 @@ class AutoRosters(commands.Cog):
     async def autorosters(self, ctx, *, overview_page):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
-        await ctx.send("Tabs:")
+        await ctx.send("Tabs `Eg. LEC 2022`:")
         try:
             tabs = await self.bot.wait_for("message", check=check, timeout=60)
         except TimeoutError:

@@ -1,4 +1,5 @@
 from mwrogue.esports_client import EsportsClient
+from mwrogue.auth_credentials import AuthCredentials
 import math
 
 
@@ -254,3 +255,9 @@ class AutoRostersRunner(object):
     def save_page(self, output):
         page = self.site.client.pages[f"User:Arbolitoloco/{self.overview_page}/Team Rosters"]
         self.site.save(page=page, text=output, summary="Automatically updating Rosters from Scoreboard Data")
+
+
+if __name__ == '__main__':
+    credentials = AuthCredentials(user_file='bot')
+    lol_site = EsportsClient('lol', credentials=credentials)
+    AutoRostersRunner(lol_site, "LMF 2022 Opening", "LMF 2022").run()

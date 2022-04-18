@@ -247,7 +247,7 @@ class AutoRostersRunner(object):
                     player_data = self.concat_args([{"player": player}])
                 player_roles_data = self.concat_args(self.rosters_data[team]["players"][player]["roles_data"])
                 player_games_by_role = self.concat_args(self.rosters_data[team]["players"][player]["games_by_role"])
-                players_text += self.PLAYER_TEXT.format(f"{player_data}", player_roles_data, player_games_by_role)
+                players_text += self.PLAYER_TEXT.format(player_data, player_roles_data, player_games_by_role)
             teamsvs = self.concat_args(self.rosters_data[team]["teamsvs"])
             output += self.TEAM_TEXT.format(team, teamsvs, players_text)
         return output

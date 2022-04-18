@@ -3,7 +3,7 @@ from rivercogutils import utils
 from redbot.core import commands
 from asyncio import TimeoutError
 
-from autorosters.autorosters_main import AutoRostersRunner
+from autorosters_main import AutoRostersRunner
 
 
 class AutoRosters(commands.Cog):

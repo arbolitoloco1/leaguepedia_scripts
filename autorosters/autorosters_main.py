@@ -218,14 +218,12 @@ class AutoRostersRunner(object):
     @staticmethod
     def concat_args(data):
         ret = ''
+        lookup = data
         if type(data) == dict:
             lookup = []
             for k, v in data.items():
                 lookup.append({k: v})
-        elif type(data) == list:
-            lookup = data
-        else:
-            return
+
         for pair in lookup:
             pair: dict
             for key in pair.keys():

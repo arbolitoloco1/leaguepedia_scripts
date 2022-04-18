@@ -3,7 +3,7 @@ from rivercogutils import utils
 from redbot.core import commands
 from asyncio import TimeoutError
 
-from autorosters_main import AutoRostersRunner
+from .autorosters_main import AutoRostersRunner
 
 
 class AutoRosters(commands.Cog):
@@ -26,5 +26,5 @@ class AutoRosters(commands.Cog):
         site = EsportsClient('lol', credentials=credentials,
                              max_retries_mwc=0,
                              max_retries=2, retry_interval=10)
-        AutoRostersRunner(site, overview_page, tabs).run()
+        AutoRostersRunner(site, overview_page, tabs.content).run()
         await ctx.send('Okay, done!')

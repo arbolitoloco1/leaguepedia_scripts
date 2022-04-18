@@ -20,8 +20,7 @@ class AutoRostersRunner(object):
         self.initialize_roster_data()
         players_data = self.get_player_data()
         self.process_game_data()
-        sorted_data = self.get_order()
-        output = self.make_output(sorted_data, players_data)
+        output = self.make_output(players_data)
         self.save_page(output)
 
     def get_and_process_match_data(self):
@@ -198,7 +197,8 @@ class AutoRostersRunner(object):
                 for role, role_data in player["games_by_role"].items():
                     player["games_by_role"][role] = role_data[:-1]
 
-    def get_order(self):
+    @staticmethod
+    def get_order(rosters_data):
         role_numbers = {
             "Top": 1,
             "Jungle": 2,
@@ -206,9 +206,9 @@ class AutoRostersRunner(object):
             "Bot": 4,
             "Support": 5
         }
-        sorted_teams = sorted(list(self.rosters_data.keys()))
+        sorted_teams = sorted(list(rosters_data.keys()))
         sorted_data = {"teams": sorted_teams, "players": {}}
-        for team, team_data in self.rosters_data.items():
+        for team, team_data in rosters_data.items():
             team_players = {}
             for player, player_data in team_data["players"].items():
                 team_players[player] = role_numbers[player_data["roles"][0]]
@@ -233,8 +233,9 @@ class AutoRostersRunner(object):
                     ret = ret + '|{}={}'.format(key, str(pair[key]))
         return ret
 
-    def make_output(self, sorted_data, players_data):
+    def make_output(self, players_data):
         output = self.PAGE_HEADER.format(self.tabs)
+        sorted_data = self.get_order(self.rosters_data)
         for team in sorted_data["teams"]:
             players_text = ""
             for player in sorted_data["players"][team]:

@@ -6,6 +6,7 @@ class AutoRostersRunner(object):
     def __init__(self, site: EsportsClient, overview_page, tabs):
         self.site = site
         self.overview_page = self.site.cache.get_target(overview_page)
+        self.tabs = tabs
         self.match_data = {}
         self.alt_teamnames = {}
         self.rosters_data = {}
@@ -234,7 +235,7 @@ class AutoRostersRunner(object):
         return ret
 
     def make_output(self, sorted_data, players_data):
-        output = self.PAGE_HEADER.format("LEC 2022")
+        output = self.PAGE_HEADER.format(self.tabs)
         for team in sorted_data["teams"]:
             players_text = ""
             for player in sorted_data["players"][team]:
@@ -252,4 +253,4 @@ class AutoRostersRunner(object):
 
     def save_page(self, output):
         page = self.site.client.pages[f"User:Arbolitoloco/{self.overview_page}/Team Rosters"]
-        self.site.save(title=page, text=output, summary="Automatically updating Rosters from Scoreboard Data")
+        self.site.save(page=page, text=output, summary="Automatically updating Rosters from Scoreboard Data")

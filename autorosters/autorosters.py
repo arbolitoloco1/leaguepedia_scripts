@@ -1,13 +1,13 @@
 from mwrogue.esports_client import EsportsClient
 from rivercogutils import utils
-from redbot.core import commands, utils
+from redbot.core import commands, utils as redutils
 from asyncio import TimeoutError
 
 from .autorosters_main import AutoRostersRunner
 
 
 async def is_lol_staff(ctx) -> bool:
-    role = utils.find(lambda r: r.name == 'LoL-Staff', ctx.message.guild.roles)
+    role = redutils.get(ctx.guild.roles, name="LoL-Staff")
     if role not in ctx.author.roles:
         raise commands.UserFeedbackCheckFailure("You don't have enough permissions to run this command!")
     return True

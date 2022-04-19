@@ -151,7 +151,8 @@ class AutoRostersRunner(object):
             tables="Players=P, PlayerRedirects=PR",
             join_on="PR.OverviewPage=P.OverviewPage",
             where=where,
-            fields=["P.NameFull=name", "P.Player", "P.NationalityPrimary=NP", "P.Country", "P.Residency"]
+            fields=["CONCAT(CASE WHEN A.IsTransliterated=\"1\" THEN P.NameFull ELSE P.Name END)=name", "P.Player",
+                    "P.NationalityPrimary=NP", "P.Country", "P.Residency"]
         )
 
         for player_data in response:
@@ -184,7 +185,7 @@ class AutoRostersRunner(object):
                     for player in self.rosters_data[team]["players"].keys():
                         if "sg_data" in game.keys():
                             if player in game["sg_data"]["players"].keys():
-                                if team == alt_teamnames[game["sg_data"]["players"][player]["team"]]:
+                                if team == self.alt_teamnames[game["sg_data"]["players"][player]["team"]]:
                                     for role in self.rosters_data[team]["players"][player]["games_by_role"]:
                                         lookup_role = role.replace("r", "role")
                                         role_name = self.rosters_data[team]["players"][player]["roles_data"][lookup_role]

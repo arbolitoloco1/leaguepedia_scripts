@@ -260,7 +260,7 @@ class AutoRostersRunner(object):
         return output
 
     def save_page(self, output):
-        page = self.site.client.pages[f"User:Arbolitoloco/{self.overview_page}/Team Rosters"]
+        page = self.site.client.pages[f"{self.overview_page}/Team Rosters"]
         self.site.save(page=page, text=output, summary="Automatically updating Rosters from Scoreboard Data")
 
 

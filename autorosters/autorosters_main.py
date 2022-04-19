@@ -182,17 +182,18 @@ class AutoRostersRunner(object):
             for game in match["games"].values():
                 for team in current_teams:
                     for player in self.rosters_data[team]["players"].keys():
-                        if player in game["sg_data"]["players"].keys():
-                            for role in self.rosters_data[team]["players"][player]["games_by_role"]:
-                                lookup_role = role.replace("r", "role")
-                                role_name = self.rosters_data[team]["players"][player]["roles_data"][lookup_role]
-                                if role_name == game["sg_data"]["players"][player]["role"]:
-                                    self.rosters_data[team]["players"][player]["games_by_role"][role] += "y"
-                                else:
+                        if "sg_data" in game.keys():
+                            if player in game["sg_data"]["players"].keys():
+                                for role in self.rosters_data[team]["players"][player]["games_by_role"]:
+                                    lookup_role = role.replace("r", "role")
+                                    role_name = self.rosters_data[team]["players"][player]["roles_data"][lookup_role]
+                                    if role_name == game["sg_data"]["players"][player]["role"]:
+                                        self.rosters_data[team]["players"][player]["games_by_role"][role] += "y"
+                                    else:
+                                        self.rosters_data[team]["players"][player]["games_by_role"][role] += "n"
+                            else:
+                                for role in self.rosters_data[team]["players"][player]["games_by_role"]:
                                     self.rosters_data[team]["players"][player]["games_by_role"][role] += "n"
-                        else:
-                            for role in self.rosters_data[team]["players"][player]["games_by_role"]:
-                                self.rosters_data[team]["players"][player]["games_by_role"][role] += "n"
             for team in current_teams:
                 for player in self.rosters_data[team]["players"].keys():
                     for role in self.rosters_data[team]["players"][player]["games_by_role"]:

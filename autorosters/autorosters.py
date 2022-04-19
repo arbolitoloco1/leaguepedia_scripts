@@ -8,6 +8,7 @@ from .autorosters_main import AutoRostersRunner
 
 async def is_lol_staff(ctx) -> bool:
     staff_role = lambda role: role.name == 'LoL-Staff', ctx.message.guild.roles
+    await ctx.send(str(staff_role))
     if staff_role not in ctx.author.roles:
         raise commands.UserFeedbackCheckFailure("You don't have enough permissions to run this command!")
     return True

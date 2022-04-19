@@ -7,7 +7,7 @@ from .autorosters_main import AutoRostersRunner
 
 
 async def is_lol_staff(ctx) -> bool:
-    role = redutils.find(lambda r: r.name == 'LoL-Staff', ctx.message.guild.roles)
+    role = await ctx.send(str(ctx.message.guild.roles))
     if role not in ctx.author.roles:
         raise commands.UserFeedbackCheckFailure("You don't have enough permissions to run this command!")
     return True

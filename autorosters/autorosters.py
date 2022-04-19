@@ -1,9 +1,16 @@
 from mwrogue.esports_client import EsportsClient
 from rivercogutils import utils
-from redbot.core import commands
+from redbot.core import commands, utils
 from asyncio import TimeoutError
 
 from .autorosters_main import AutoRostersRunner
+
+
+async def is_lol_staff(ctx) -> bool:
+    role = utils.find(lambda r: r.name == 'LoL-Staff', ctx.message.guild.roles)
+    if role not in ctx.author.roles:
+        raise commands.UserFeedbackCheckFailure("You don't have enough permissions to run this command!")
+    return True
 
 
 class AutoRosters(commands.Cog):
@@ -13,7 +20,7 @@ class AutoRosters(commands.Cog):
         self.bot = bot
 
     @commands.command(pass_context=True)
-    @commands.has_role("LoL-Staff")
+    @commands.check(is_lol_staff)
     async def autorosters(self, ctx, *, overview_page):
         """Generate team rosters for the specified tournament"""
         def check(msg):

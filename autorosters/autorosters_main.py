@@ -80,7 +80,7 @@ class AutoRostersRunner(object):
             where=f"PR.AllName = '{player}'",
             join_on="P.OverviewPage=PR.OverviewPage"
         )
-        return response[0]["Player"]
+        return response[0]["Player"] or player
 
     def process_scoreboard_data(self, scoreboard_data):
         player_ids_cache = {}

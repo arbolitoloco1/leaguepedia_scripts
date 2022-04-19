@@ -80,7 +80,7 @@ class AutoRostersRunner(object):
             where=f"PR.AllName = '{player}'",
             join_on="P.OverviewPage=PR.OverviewPage"
         )
-        if not response[0]:
+        if not response:
             return player
         return response[0]["Player"]
 

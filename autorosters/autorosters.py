@@ -7,8 +7,7 @@ from .autorosters_main import AutoRostersRunner
 
 
 async def is_lol_staff(ctx) -> bool:
-    for role in ctx.message.guild.roles:
-        staff_role = role break if role.name == "LoL-Staff"
+    staff_role = lambda role: role.name == 'LoL-Staff', ctx.message.guild.roles
     if staff_role not in ctx.author.roles:
         raise commands.UserFeedbackCheckFailure("You don't have enough permissions to run this command!")
     return True

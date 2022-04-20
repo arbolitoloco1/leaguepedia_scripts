@@ -4,24 +4,30 @@ import math
 
 
 class AutoRostersRunner(object):
-    def __init__(self, site: EsportsClient, overview_page, tabs):
+    def __init__(self, site: EsportsClient, overview_page):
         self.site = site
         self.overview_page = self.site.cache.get_target(overview_page)
-        self.tabs = tabs
+        self.tabs = str
         self.match_data = {}
         self.alt_teamnames = {}
         self.rosters_data = {}
-        self.PAGE_HEADER = "{{{{Tabs:{}}}}}{{{{TOCFlat}}}}"
+        self.PAGE_HEADER = "{}{{{{TOCFlat}}}}"
         self.TEAM_TEXT = "\n\n==={{{{team|{}}}}}===\n{{{{ExtendedRoster{}{}\n}}}}"
         self.PLAYER_TEXT = "\n|{{{{ExtendedRoster/Line{}{}\n{} }}}}"
 
     def run(self):
+        self.get_tabs()
         self.get_and_process_match_data()
         self.initialize_roster_data()
         players_data = self.get_player_data()
         self.process_game_data()
         output = self.make_output(players_data)
         self.save_page(output)
+
+    def get_tabs(self):
+        page = self.site.client.pages[self.overview_page]
+        page_text = page.text()
+        self.tabs = page_text.strip("\n")[0]
 
     def get_and_process_match_data(self):
         matchschedule_data = self.get_matchschedule_data()
@@ -267,4 +273,4 @@ class AutoRostersRunner(object):
 if __name__ == '__main__':
     credentials = AuthCredentials(user_file='bot')
     lol_site = EsportsClient('lol', credentials=credentials)
-    AutoRostersRunner(lol_site, "LMF 2022 Opening", "LMF 2022").run()
+    AutoRostersRunner(lol_site, "LMF 2022 Opening").run()

@@ -1,6 +1,7 @@
 from mwrogue.esports_client import EsportsClient
 from mwrogue.auth_credentials import AuthCredentials
 import math
+import re
 
 
 class AutoRostersRunner(object):
@@ -11,7 +12,7 @@ class AutoRostersRunner(object):
         self.match_data = {}
         self.alt_teamnames = {}
         self.rosters_data = {}
-        self.PAGE_HEADER = "{}{{{{TOCFlat}}}}"
+        self.PAGE_HEADER = "{{{{Tabs:{}}}}}{{{{TOCFlat}}}}"
         self.TEAM_TEXT = "\n\n==={{{{team|{}}}}}===\n{{{{ExtendedRoster{}{}\n}}}}"
         self.PLAYER_TEXT = "\n|{{{{ExtendedRoster/Line{}{}\n{} }}}}"
 
@@ -27,7 +28,7 @@ class AutoRostersRunner(object):
     def get_tabs(self):
         page = self.site.client.pages[self.overview_page]
         page_text = page.text()
-        self.tabs = page_text.strip("\n")[0]
+        self.tabs = re.search(r'{{Tabs:(.*?)}}', page_text).group(1) or ""
 
     def get_and_process_match_data(self):
         matchschedule_data = self.get_matchschedule_data()
@@ -266,7 +267,7 @@ class AutoRostersRunner(object):
         return output
 
     def save_page(self, output):
-        page = self.site.client.pages[f"{self.overview_page}/Team Rosters"]
+        page = self.site.client.pages[f"User:Arbolitoloco/{self.overview_page}/Team Rosters"]
         self.site.save(page=page, text=output, summary="Automatically updating Rosters from Scoreboard Data")
 
 

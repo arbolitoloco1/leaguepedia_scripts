@@ -40,6 +40,6 @@ class AutoRosters(commands.Cog):
         sandbox_page = f"https://lol.fandom.com/wiki/User:{username}/Team Rosters Sandbox"
         rosters_page = f"https://lol.fandom.com/wiki/{overview_page}/Team Rosters"
         await ctx.send('Okay, done! **Remember the generated content has no coaches!**')
-        await ctx.send(f'Here is the sandbox page with the new content: `{sandbox_page}`')
-        await ctx.send(f'Here is where you should copy it: `{rosters_page}`')
+        await ctx.send(f'Here is the sandbox page with the new content: {sandbox_page}')
+        await ctx.send(f'Here is where you should copy it: {rosters_page}')
 

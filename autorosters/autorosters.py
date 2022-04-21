@@ -32,9 +32,8 @@ class AutoRosters(commands.Cog):
                              max_retries_mwc=0,
                              max_retries=2, retry_interval=10)
         overview_page = site.cache.get_target(overview_page)
-        if not overview_page:
+        if not site.client.pages[overview_page]:
             return await ctx.send('The tournament page does not exist!')
-        await ctx.send(str(overview_page))
         AutoRostersRunner(site, overview_page).run()
         sandbox_page = f"User:{site.credentials.username.split('@')[0]}/Team Rosters Sandbox"
         rosters_page = f"{overview_page}/Team Rosters"

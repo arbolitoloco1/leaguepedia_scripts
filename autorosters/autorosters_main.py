@@ -175,8 +175,8 @@ class AutoRostersRunner(object):
     def add_team_vs(self, current_teams):
         n_teams = {}
         for team in current_teams:
-            if not self.rosters_data[team]:
-                self.rosters_data[team] = {}
+            if team not in self.rosters_data.keys():
+                self.rosters_data[team] = {"teamsvs": {}}
             if not self.rosters_data[team]["teamsvs"]:
                 n_teams[team] = 0
             n_teams[team] = len(self.rosters_data[team]["teamsvs"]) + 1

@@ -7,6 +7,8 @@ from .autorosters_main import AutoRostersRunner
 
 async def is_lol_staff(ctx) -> bool:
     staff_role = None
+    if isinstance(ctx.channel, redbot.core.discord.DMChannel):
+        raise commands.UserFeedbackCheckFailure("DM!")
     for role in ctx.message.guild.roles:
         if role.name == "LoL-Staff":
             staff_role = role

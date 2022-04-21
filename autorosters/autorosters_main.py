@@ -266,7 +266,7 @@ class AutoRostersRunner(object):
         return output
 
     def save_page(self, output):
-        page = self.site.client.pages[f"User:{self.site.credentials.username.strip('@')[0]}/Team Rosters Sandbox"]
+        page = self.site.client.pages[f"User:{self.site.credentials.username.split('@')[0]}/Team Rosters Sandbox"]
         self.site.save(page=page, text=output, summary="Generating Rosters from Scoreboard Data")
 
 

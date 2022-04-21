@@ -189,9 +189,10 @@ class AutoRostersRunner(object):
             self.add_team_vs(current_teams)
             if match["ff"]:
                 for team in current_teams:
-                    for player in self.rosters_data[team]["players"].values():
-                        for role in player["games_by_role"].keys():
-                            player["games_by_role"][role] += f"{'n' * math.ceil(int(match['best_of']) / 2)},"
+                    if "players" in self.rosters_data[team].keys():
+                        for player in self.rosters_data[team]["players"].values():
+                            for role in player["games_by_role"].keys():
+                                player["games_by_role"][role] += f"{'n' * math.ceil(int(match['best_of']) / 2)},"
                 continue
             for game in match["games"].values():
                 game_sg_players = game["sg_data"]["players"]

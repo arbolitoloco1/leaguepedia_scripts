@@ -35,7 +35,9 @@ class AutoRosters(commands.Cog):
         if not site.client.pages[overview_page].exists:
             return await ctx.send('The tournament page does not exist!')
         AutoRostersRunner(site, overview_page).run()
-        sandbox_page = f"User:{site.credentials.username.split('@')[0]}/Team Rosters Sandbox"
+        username = site.credentials.username
+        username = username.split('@')[0] if "@" in username else username
+        sandbox_page = f"User:{username}/Team Rosters Sandbox"
         rosters_page = f"{overview_page}/Team Rosters"
         await ctx.send('Okay, done! **Remember the generated content has no coaches!**')
         await ctx.send(f'Here is the sandbox page with the new content: `{sandbox_page}`')

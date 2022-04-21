@@ -32,4 +32,9 @@ class AutoRosters(commands.Cog):
                              max_retries_mwc=0,
                              max_retries=2, retry_interval=10)
         AutoRostersRunner(site, overview_page).run()
-        await ctx.send('Okay, done!')
+        sandbox_page = f"User:{site.credentials.username}/Team Rosters Sandbox"
+        rosters_page = f"{site.cache.get_target(overview_page)}/Team Rosters"
+        await ctx.send('Okay, done! **Remember the generated content has no coaches!**')
+        await ctx.send(f'Here is the sandbox page with the new content: `{sandbox_page}`')
+        await ctx.send(f'Here is where you should copy it: `{rosters_page}`')
+

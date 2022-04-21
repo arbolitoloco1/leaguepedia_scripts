@@ -200,10 +200,10 @@ class AutoRostersRunner(object):
                 for team in current_teams:
                     rd_team = self.rosters_data[team]
                     for player in rd_team["players"].keys():
-                        game_sg_player = game_sg_players[player]
                         game_rd_player = rd_team["players"][player]
                         if "sg_data" in game.keys():
                             if player in game_sg_players.keys():
+                                game_sg_player = game_sg_players[player]
                                 if team == self.alt_teamnames[game_sg_player["team"]]:
                                     for role in game_rd_player["games_by_role"]:
                                         lookup_role = role.replace("r", "role")

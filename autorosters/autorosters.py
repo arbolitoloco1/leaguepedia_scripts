@@ -1,6 +1,7 @@
 from mwrogue.esports_client import EsportsClient
 from rivercogutils import utils
 from redbot.core import commands
+import redbot.core
 
 from .autorosters_main import AutoRostersRunner
 

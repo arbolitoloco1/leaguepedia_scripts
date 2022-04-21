@@ -267,8 +267,8 @@ class AutoRostersRunner(object):
             if not sorted_data["players"][team]:
                 continue
             for player in sorted_data["players"][team]:
-                game_rd_player = self.rosters_data[team]["players"][player]
                 player = player[0]
+                game_rd_player = self.rosters_data[team]["players"][player]
                 if players_data.get(player):
                     player_data = self.concat_args(players_data[player])
                 else:

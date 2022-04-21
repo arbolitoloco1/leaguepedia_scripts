@@ -189,10 +189,11 @@ class AutoRostersRunner(object):
             self.add_team_vs(current_teams)
             if match["ff"]:
                 for team in current_teams:
-                    if "players" in self.rosters_data[team].keys():
-                        for player in self.rosters_data[team]["players"].values():
-                            for role in player["games_by_role"].keys():
-                                player["games_by_role"][role] += f"{'n' * math.ceil(int(match['best_of']) / 2)},"
+                    if "players" not in self.rosters_data[team].keys():
+                        continue
+                    for player in self.rosters_data[team]["players"].values():
+                        for role in player["games_by_role"].keys():
+                            player["games_by_role"][role] += f"{'n' * math.ceil(int(match['best_of']) / 2)},"
                 continue
             for game in match["games"].values():
                 game_sg_players = game["sg_data"]["players"]
@@ -221,6 +222,8 @@ class AutoRostersRunner(object):
                     for role in game_rd_player["games_by_role"]:
                         game_rd_player["games_by_role"][role] += ","
         for team_data in self.rosters_data.values():
+            if "players" not in team_data.keys():
+                continue
             for player in team_data["players"].values():
                 for role, role_data in player["games_by_role"].items():
                     player["games_by_role"][role] = role_data[:-1]
@@ -230,6 +233,9 @@ class AutoRostersRunner(object):
         sorted_data = {"teams": sorted_teams, "players": {}}
         for team, team_data in self.rosters_data.items():
             team_players = {}
+            if "players" not in team_data.keys():
+                sorted_data["players"][team] = {}
+                continue
             for player, player_data in team_data["players"].items():
                 team_players[player] = self.role_numbers[player_data["roles"][0]]
             sorted_data["players"][team] = sorted(team_players.items(), key=lambda x: x[1])
@@ -258,6 +264,8 @@ class AutoRostersRunner(object):
         sorted_data = self.get_order()
         for team in sorted_data["teams"]:
             players_text = ""
+            if not sorted_data[team]["players"]:
+                continue
             for player in sorted_data["players"][team]:
                 game_rd_player = self.rosters_data[team]["players"][player]
                 player = player[0]

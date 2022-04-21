@@ -1,7 +1,6 @@
 from mwrogue.esports_client import EsportsClient
 from rivercogutils import utils
 from redbot.core import commands
-import redbot.core
 
 from .autorosters_main import AutoRostersRunner
 
@@ -9,7 +8,7 @@ from .autorosters_main import AutoRostersRunner
 async def is_lol_staff(ctx) -> bool:
     staff_role = None
     if not ctx.guild:
-        raise commands.UserFeedbackCheckFailure("DM Error!")
+        raise commands.UserFeedbackCheckFailure("You must be in a server to run this command!")
     for role in ctx.message.guild.roles:
         if role.name == "LoL-Staff":
             staff_role = role
@@ -26,7 +25,6 @@ class AutoRosters(commands.Cog):
         self.bot = bot
 
     @commands.command(pass_context=True)
-    @commands.guild_only()
     @commands.check(is_lol_staff)
     async def autorosters(self, ctx, *, overview_page):
         """Generate team rosters for the specified tournament"""

@@ -47,7 +47,7 @@ class AutoRostersRunner(object):
             fields=["MS.MatchId", "MSG.GameId", "MS.FF=MSFF", "MSG.FF=MSGFF", "MS.BestOf", "MS.Team1Final",
                     "MS.Team2Final", "MS.Team1", "MS.Team2"],
             join_on="MS.MatchId=MSG.MatchId",
-            where=f"MS.OverviewPage = '{self.overview_page}' AND MSG.Blue IS NOT NULL AND MSG.Red IS NOT NULL",
+            where=f"MS.OverviewPage = '{self.overview_page}' AND MS.Team1 IS NOT NULL AND MS.Team2 IS NOT NULL",
             order_by="MS.N_Page, MS.N_MatchInPage, MSG.N_GameInMatch"
         )
         return matchschedule_data

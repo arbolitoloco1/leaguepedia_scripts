@@ -11,7 +11,7 @@ class AutoRostersRunner(object):
 
     def __init__(self, site: EsportsClient, overview_page):
         self.site = site
-        self.overview_page = self.site.cache.get_target(overview_page)
+        self.overview_page = overview_page
         self.tabs = str
         self.match_data = {}
         self.alt_teamnames = {}

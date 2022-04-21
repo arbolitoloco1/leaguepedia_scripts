@@ -198,7 +198,7 @@ class AutoRostersRunner(object):
             for game in match["games"].values():
                 for team in current_teams:
                     rd_team = self.rosters_data[team]
-                    print(rd_team.players)
+                    print(rd_team["players"])
                     for player in rd_team["players"].keys():
                         game_rd_player = rd_team["players"][player]
                         if "sg_data" in game.keys():

@@ -184,6 +184,7 @@ class AutoRostersRunner(object):
         self.rosters_data[current_teams[1]]["teamsvs"].append({f"team{n_teams[current_teams[1]]}": current_teams[0]})
 
     def process_game_data(self):
+        print(self.rosters_data)
         for match in self.match_data.values():
             current_teams = [self.alt_teamnames[match["team1"]], self.alt_teamnames[match["team2"]]]
             self.add_team_vs(current_teams)
@@ -198,8 +199,6 @@ class AutoRostersRunner(object):
             for game in match["games"].values():
                 for team in current_teams:
                     rd_team = self.rosters_data[team]
-                    if not rd_team.get("players"):
-                        print(rd_team)
                     for player in rd_team["players"].keys():
                         game_rd_player = rd_team["players"][player]
                         if "sg_data" in game.keys():

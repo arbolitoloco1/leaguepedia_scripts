@@ -5,6 +5,10 @@ import re
 
 
 class AutoRostersRunner(object):
+    PAGE_HEADER = "{{{{Tabs:{}}}}}{{{{TOCFlat}}}}"
+    TEAM_TEXT = "\n\n==={{{{team|{}}}}}===\n{{{{ExtendedRoster{}{}\n}}}}"
+    PLAYER_TEXT = "\n|{{{{ExtendedRoster/Line{}{}\n{} }}}}"
+
     def __init__(self, site: EsportsClient, overview_page):
         self.site = site
         self.overview_page = self.site.cache.get_target(overview_page)
@@ -12,9 +16,13 @@ class AutoRostersRunner(object):
         self.match_data = {}
         self.alt_teamnames = {}
         self.rosters_data = {}
-        self.PAGE_HEADER = "{{{{Tabs:{}}}}}{{{{TOCFlat}}}}"
-        self.TEAM_TEXT = "\n\n==={{{{team|{}}}}}===\n{{{{ExtendedRoster{}{}\n}}}}"
-        self.PLAYER_TEXT = "\n|{{{{ExtendedRoster/Line{}{}\n{} }}}}"
+        self.role_numbers = {
+            "Top": 1,
+            "Jungle": 2,
+            "Mid": 3,
+            "Bot": 4,
+            "Support": 5
+        }
 
     def run(self):
         self.get_tabs()
@@ -31,12 +39,12 @@ class AutoRostersRunner(object):
         self.tabs = re.search(r'{{Tabs:(.*?)}}', page_text).group(1) or ""
 
     def get_and_process_match_data(self):
-        matchschedule_data = self.get_matchschedule_data()
-        scoreboard_data = self.get_scoreboard_data(matchschedule_data)
+        matchschedule_data = self.query_matchschedule_data()
+        scoreboard_data = self.query_scoreboard_data(matchschedule_data)
         self.process_matchschedule_data(matchschedule_data)
         self.process_scoreboard_data(scoreboard_data)
 
-    def get_matchschedule_data(self):
+    def query_matchschedule_data(self):
         matchschedule_data = self.site.cargo_client.query(
             tables="MatchSchedule=MS, MatchScheduleGame=MSG",
             fields=["MS.MatchId", "MSG.GameId", "MS.FF=MSFF", "MSG.FF=MSGFF", "MS.BestOf", "MS.Team1Final",
@@ -49,15 +57,15 @@ class AutoRostersRunner(object):
 
     @staticmethod
     def get_where_scoreboard_data(matchschedule_data):
-        where = "SG.GameId IN ("
+        where = "SG.GameId IN ({})"
+        gameids_to_query = []
         for game in matchschedule_data:
             if not game["MSFF"] or not game["MSGFF"]:
-                game_id = game["GameId"]
-                where += f'"{game_id}", '
-        where = where[:-2] + ")"
+                gameids_to_query.append(f"\"{game['GameId']}\"")
+        where = where.format(" ,".join(gameids_to_query))
         return where
 
-    def get_scoreboard_data(self, matchschedule_data):
+    def query_scoreboard_data(self, matchschedule_data):
         where = self.get_where_scoreboard_data(matchschedule_data)
         scoreboard_data = self.site.cargo_client.query(
             tables="ScoreboardGames=SG, ScoreboardPlayers=SP",
@@ -139,15 +147,14 @@ class AutoRostersRunner(object):
 
     @staticmethod
     def get_where_player_data(rosters_data):
-        players = []
+        where = "PR.AllName IN ({})"
 
-        where = "PR.AllName IN ("
+        players = {}
         for team in rosters_data.values():
             for player in team["players"].keys():
-                if player not in players:
-                    players.append(player)
-                    where += f'"{player}", '
-        where = where[:-2] + ")"
+                if player not in players.keys():
+                    players[player] = f"\"{player}\""
+        where = where.format(" ,".join(players.values()))
         return where
 
     def get_player_data(self):
@@ -212,21 +219,13 @@ class AutoRostersRunner(object):
                 for role, role_data in player["games_by_role"].items():
                     player["games_by_role"][role] = role_data[:-1]
 
-    @staticmethod
-    def get_order(rosters_data):
-        role_numbers = {
-            "Top": 1,
-            "Jungle": 2,
-            "Mid": 3,
-            "Bot": 4,
-            "Support": 5
-        }
-        sorted_teams = sorted(list(rosters_data.keys()))
+    def get_order(self):
+        sorted_teams = sorted(list(self.rosters_data.keys()))
         sorted_data = {"teams": sorted_teams, "players": {}}
-        for team, team_data in rosters_data.items():
+        for team, team_data in self.rosters_data.items():
             team_players = {}
             for player, player_data in team_data["players"].items():
-                team_players[player] = role_numbers[player_data["roles"][0]]
+                team_players[player] = self.role_numbers[player_data["roles"][0]]
             sorted_data["players"][team] = sorted(team_players.items(), key=lambda x: x[1])
         return sorted_data
 
@@ -250,7 +249,7 @@ class AutoRostersRunner(object):
 
     def make_output(self, players_data):
         output = self.PAGE_HEADER.format(self.tabs)
-        sorted_data = self.get_order(self.rosters_data)
+        sorted_data = self.get_order()
         for team in sorted_data["teams"]:
             players_text = ""
             for player in sorted_data["players"][team]:
@@ -267,8 +266,8 @@ class AutoRostersRunner(object):
         return output
 
     def save_page(self, output):
-        page = self.site.client.pages[f"User:Arbolitoloco/{self.overview_page}/Team Rosters"]
-        self.site.save(page=page, text=output, summary="Automatically updating Rosters from Scoreboard Data")
+        page = self.site.client.pages[f"User:{self.site.credentials.username}/Team Rosters Sandbox"]
+        self.site.save(page=page, text=output, summary="Generating Rosters from Scoreboard Data")
 
 
 if __name__ == '__main__':

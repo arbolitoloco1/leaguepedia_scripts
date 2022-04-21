@@ -264,7 +264,7 @@ class AutoRostersRunner(object):
         sorted_data = self.get_order()
         for team in sorted_data["teams"]:
             players_text = ""
-            if not team["players"]:
+            if not sorted_data["players"][team]:
                 continue
             for player in sorted_data["players"][team]:
                 game_rd_player = self.rosters_data[team]["players"][player]

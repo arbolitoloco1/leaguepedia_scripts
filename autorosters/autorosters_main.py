@@ -47,7 +47,7 @@ class AutoRostersRunner(object):
             fields=["MS.MatchId", "MSG.GameId", "MS.FF=MSFF", "MSG.FF=MSGFF", "MS.BestOf", "MS.Team1Final",
                     "MS.Team2Final", "MS.Team1", "MS.Team2"],
             join_on="MS.MatchId=MSG.MatchId",
-            where=f"MS.OverviewPage = '{self.overview_page}'",
+            where=f"MS.OverviewPage = '{self.overview_page}' AND MSG.Blue IS NOT NULL AND MSG.Red IS NOT NULL",
             order_by="MS.N_Page, MS.N_MatchInPage, MSG.N_GameInMatch"
         )
         return matchschedule_data
@@ -198,7 +198,6 @@ class AutoRostersRunner(object):
             for game in match["games"].values():
                 for team in current_teams:
                     rd_team = self.rosters_data[team]
-                    print(team)
                     for player in rd_team["players"].keys():
                         game_rd_player = rd_team["players"][player]
                         if "sg_data" in game.keys():

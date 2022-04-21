@@ -8,7 +8,8 @@ from .autorosters_main import AutoRostersRunner
 
 async def is_lol_staff(ctx) -> bool:
     staff_role = None
-    print(ctx.guild)
+    if not ctx.guild:
+        raise commands.UserFeedbackCheckFailure("DM Error!")
     for role in ctx.message.guild.roles:
         if role.name == "LoL-Staff":
             staff_role = role

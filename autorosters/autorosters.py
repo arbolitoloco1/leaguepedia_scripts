@@ -27,14 +27,13 @@ class AutoRosters(commands.Cog):
     async def autorosters(self, ctx, *, overview_page):
         """Generate team rosters for the specified tournament"""
         await ctx.send('Okay, starting now!')
-        async with ctx.typing():
-            credentials = await utils.get_credentials(ctx, self.bot)
-            site = EsportsClient('lol', credentials=credentials,
-                                 max_retries_mwc=0,
-                                 max_retries=2, retry_interval=10)
-            AutoRostersRunner(site, overview_page).run()
-            sandbox_page = f"User:{site.credentials.username.split('@')[0]}/Team Rosters Sandbox"
-            rosters_page = f"{site.cache.get_target(overview_page)}/Team Rosters"
+        credentials = await utils.get_credentials(ctx, self.bot)
+        site = EsportsClient('lol', credentials=credentials,
+                             max_retries_mwc=0,
+                             max_retries=2, retry_interval=10)
+        AutoRostersRunner(site, overview_page).run()
+        sandbox_page = f"User:{site.credentials.username.split('@')[0]}/Team Rosters Sandbox"
+        rosters_page = f"{site.cache.get_target(overview_page)}/Team Rosters"
         await ctx.send('Okay, done! **Remember the generated content has no coaches!**')
         await ctx.send(f'Here is the sandbox page with the new content: `{sandbox_page}`')
         await ctx.send(f'Here is where you should copy it: `{rosters_page}`')

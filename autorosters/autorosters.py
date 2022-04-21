@@ -1,12 +1,12 @@
 from mwrogue.esports_client import EsportsClient
 from rivercogutils import utils
 from redbot.core import commands
-from asyncio import TimeoutError
 
 from .autorosters_main import AutoRostersRunner
 
 
 async def is_lol_staff(ctx) -> bool:
+    staff_role = None
     for role in ctx.message.guild.roles:
         if role.name == "LoL-Staff":
             staff_role = role
@@ -32,7 +32,7 @@ class AutoRosters(commands.Cog):
                              max_retries_mwc=0,
                              max_retries=2, retry_interval=10)
         AutoRostersRunner(site, overview_page).run()
-        sandbox_page = f"User:{site.credentials.username}/Team Rosters Sandbox"
+        sandbox_page = f"User:{site.credentials.username.strip('@')[0]}/Team Rosters Sandbox"
         rosters_page = f"{site.cache.get_target(overview_page)}/Team Rosters"
         await ctx.send('Okay, done! **Remember the generated content has no coaches!**')
         await ctx.send(f'Here is the sandbox page with the new content: `{sandbox_page}`')

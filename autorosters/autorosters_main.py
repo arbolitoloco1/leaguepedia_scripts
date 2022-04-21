@@ -26,7 +26,10 @@ class AutoRostersRunner(object):
 
     def run(self):
         self.get_tabs()
-        self.get_and_process_match_data()
+        matchschedule_data = self.query_matchschedule_data()
+        scoreboard_data = self.query_scoreboard_data(matchschedule_data)
+        self.process_matchschedule_data(matchschedule_data)
+        self.process_scoreboard_data(scoreboard_data)
         self.initialize_roster_data()
         players_data = self.get_player_data()
         self.process_game_data()
@@ -37,12 +40,6 @@ class AutoRostersRunner(object):
         page = self.site.client.pages[self.overview_page]
         page_text = page.text()
         self.tabs = re.search(r'{{Tabs:(.*?)}}', page_text).group(1) or ""
-
-    def get_and_process_match_data(self):
-        matchschedule_data = self.query_matchschedule_data()
-        scoreboard_data = self.query_scoreboard_data(matchschedule_data)
-        self.process_matchschedule_data(matchschedule_data)
-        self.process_scoreboard_data(scoreboard_data)
 
     def query_matchschedule_data(self):
         matchschedule_data = self.site.cargo_client.query(
@@ -103,8 +100,9 @@ class AutoRostersRunner(object):
         player_ids_cache = {}
 
         for scoreboard in scoreboard_data:
-            if "sg_data" not in self.match_data[scoreboard["MatchId"]]["games"][scoreboard["GameId"]].keys():
-                self.match_data[scoreboard["MatchId"]]["games"][scoreboard["GameId"]]["sg_data"] = {
+            game_data = self.match_data[scoreboard["MatchId"]]["games"][scoreboard["GameId"]]
+            if "sg_data" not in game_data.keys():
+                game_data["sg_data"] = {
                     "team1": scoreboard["Team1"],
                     "team2": scoreboard["Team2"],
                     "players": {}}
@@ -112,23 +110,21 @@ class AutoRostersRunner(object):
                 player_id = self.get_player_id(scoreboard["Link"])
                 player_ids_cache[scoreboard["Link"]] = player_id
             player_page = player_ids_cache[scoreboard["Link"]]
-            game_id = scoreboard["GameId"]
-            match_id = scoreboard["MatchId"]
-            self.match_data[match_id]["games"][game_id]["sg_data"]["players"][player_page] = \
-                {"role": scoreboard["IngameRole"],
-                 "team": scoreboard["Team"],
-                 "link": player_page}
+            game_data["sg_data"]["players"][player_page] = {"role": scoreboard["IngameRole"],
+                                                            "team": scoreboard["Team"],
+                                                            "link": player_page}
 
     def get_players_roles_data(self):
         for team, team_data in self.rosters_data.items():
             for player, player_data in team_data["players"].items():
-                rolesn = len(self.rosters_data[team]["players"][player]["roles"])
-                self.rosters_data[team]["players"][player]["roles_data"]["roles"] = rolesn
-                for i, role in enumerate(self.rosters_data[team]["players"][player]["roles"]):
+                player = self.rosters_data[team]["players"][player]
+                rolesn = len(player_data["roles"])
+                player["roles_data"]["roles"] = rolesn
+                for i, role in enumerate(player["roles"]):
                     rolen = f"role{i + 1}"
                     rolen_short = f"r{i + 1}"
-                    self.rosters_data[team]["players"][player]["roles_data"][rolen] = role
-                    self.rosters_data[team]["players"][player]["games_by_role"][rolen_short] = ""
+                    player["roles_data"][rolen] = role
+                    player["games_by_role"][rolen_short] = ""
 
     def initialize_roster_data(self):
         for match in self.match_data.values():
@@ -138,11 +134,12 @@ class AutoRostersRunner(object):
                         team = self.alt_teamnames[player["team"]]
                         if team not in self.rosters_data.keys():
                             self.rosters_data[team] = {"players": {}, "teamsvs": []}
-                        if player["link"] not in self.rosters_data[team]["players"].keys():
-                            self.rosters_data[team]["players"][player["link"]] = {"roles": [], "roles_data": {},
-                                                                                  "games_by_role": {}}
-                        if player["role"] not in self.rosters_data[team]["players"][player["link"]]["roles"]:
-                            self.rosters_data[team]["players"][player["link"]]["roles"].append(player["role"])
+                        team_players = self.rosters_data[team]["players"]
+                        if player["link"] not in team_players.keys():
+                            team_players[player["link"]] = {"roles": [], "roles_data": {},
+                                                            "games_by_role": {}}
+                        if player["role"] not in team_players[player["link"]]["roles"]:
+                            team_players[player["link"]]["roles"].append(player["role"])
         self.get_players_roles_data()
 
     @staticmethod
@@ -195,25 +192,31 @@ class AutoRostersRunner(object):
                             player["games_by_role"][role] += f"{'n' * math.ceil(int(match['best_of']) / 2)},"
                 continue
             for game in match["games"].values():
+                game_sg_players = game["sg_data"]["players"]
                 for team in current_teams:
-                    for player in self.rosters_data[team]["players"].keys():
+                    rd_team = self.rosters_data[team]
+                    for player in rd_team["players"].keys():
+                        game_sg_player = game_sg_players[player]
+                        game_rd_player = rd_team["players"][player]
                         if "sg_data" in game.keys():
-                            if player in game["sg_data"]["players"].keys():
-                                if team == self.alt_teamnames[game["sg_data"]["players"][player]["team"]]:
-                                    for role in self.rosters_data[team]["players"][player]["games_by_role"]:
+                            if player in game_sg_players.keys():
+                                if team == self.alt_teamnames[game_sg_player["team"]]:
+                                    for role in game_rd_player["games_by_role"]:
                                         lookup_role = role.replace("r", "role")
-                                        role_name = self.rosters_data[team]["players"][player]["roles_data"][lookup_role]
-                                        if role_name == game["sg_data"]["players"][player]["role"]:
-                                            self.rosters_data[team]["players"][player]["games_by_role"][role] += "y"
+                                        role_name = game_rd_player["roles_data"][lookup_role]
+                                        if role_name == game_sg_player["role"]:
+                                            game_rd_player["games_by_role"][role] += "y"
                                         else:
-                                            self.rosters_data[team]["players"][player]["games_by_role"][role] += "n"
+                                            game_rd_player["games_by_role"][role] += "n"
                                     continue
                             for role in self.rosters_data[team]["players"][player]["games_by_role"]:
-                                self.rosters_data[team]["players"][player]["games_by_role"][role] += "n"
+                                game_rd_player["games_by_role"][role] += "n"
             for team in current_teams:
-                for player in self.rosters_data[team]["players"].keys():
-                    for role in self.rosters_data[team]["players"][player]["games_by_role"]:
-                        self.rosters_data[team]["players"][player]["games_by_role"][role] += ","
+                rd_team = self.rosters_data[team]
+                for player in rd_team["players"].keys():
+                    game_rd_player = rd_team["players"][player]
+                    for role in game_rd_player["games_by_role"]:
+                        game_rd_player["games_by_role"][role] += ","
         for team_data in self.rosters_data.values():
             for player in team_data["players"].values():
                 for role, role_data in player["games_by_role"].items():
@@ -253,13 +256,14 @@ class AutoRostersRunner(object):
         for team in sorted_data["teams"]:
             players_text = ""
             for player in sorted_data["players"][team]:
+                game_rd_player = self.rosters_data[team]["players"][player]
                 player = player[0]
                 if players_data.get(player):
                     player_data = self.concat_args(players_data[player])
                 else:
                     player_data = self.concat_args([{"player": player}])
-                player_roles_data = self.concat_args(self.rosters_data[team]["players"][player]["roles_data"])
-                player_games_by_role = self.concat_args(self.rosters_data[team]["players"][player]["games_by_role"])
+                player_roles_data = self.concat_args(game_rd_player["roles_data"])
+                player_games_by_role = self.concat_args(game_rd_player["games_by_role"])
                 players_text += self.PLAYER_TEXT.format(player_data, player_roles_data, player_games_by_role)
             teamsvs = self.concat_args(self.rosters_data[team]["teamsvs"])
             output += self.TEAM_TEXT.format(team, teamsvs, players_text)

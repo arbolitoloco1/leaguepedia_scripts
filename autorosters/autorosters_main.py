@@ -6,7 +6,7 @@ import re
 
 class AutoRostersRunner(object):
     PAGE_TABS = "{{{{Tabs:{}}}}}"
-    PAGE_HEADER = "{{{{TOCFlat}}}}"
+    PAGE_HEADER = "{{TOCFlat}}"
     TEAM_TEXT = "\n\n==={{{{team|{}}}}}===\n{{{{ExtendedRoster{}{}\n}}}}"
     PLAYER_TEXT = "\n|{{{{ExtendedRoster/Line{}{}\n{} }}}}"
 

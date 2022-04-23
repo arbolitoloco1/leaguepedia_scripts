@@ -5,7 +5,8 @@ import re
 
 
 class AutoRostersRunner(object):
-    PAGE_HEADER = "{{{{Tabs:{}}}}}{{{{TOCFlat}}}}"
+    PAGE_TABS = "{{{{Tabs:{}}}}}"
+    PAGE_HEADER = "{{{{TOCFlat}}}}"
     TEAM_TEXT = "\n\n==={{{{team|{}}}}}===\n{{{{ExtendedRoster{}{}\n}}}}"
     PLAYER_TEXT = "\n|{{{{ExtendedRoster/Line{}{}\n{} }}}}"
 
@@ -265,9 +266,10 @@ class AutoRostersRunner(object):
     def make_output(self, players_data):
         output = ""
         if self.tabs:
-            output += self.PAGE_HEADER.format(self.tabs)
+            output += self.PAGE_TABS.format(self.tabs)
         else:
             self.warnings.append("There are no tabs on the overview page!")
+        output += self.PAGE_HEADER
         sorted_data = self.get_order()
         for team in sorted_data["teams"]:
             players_text = ""
